@@ -48,6 +48,7 @@ class CircleBucket<Layer: CircleStyleLayer | HeatmapStyleLayer> implements Bucke
     layerIds: Array<string>;
     layers: Array<Layer>;
     stateDependentLayers: Array<Layer>;
+    stateDependentLayerIds: Array<string>;
 
     layoutVertexArray: CircleLayoutArray;
     layoutVertexBuffer: VertexBuffer;
@@ -72,6 +73,8 @@ class CircleBucket<Layer: CircleStyleLayer | HeatmapStyleLayer> implements Bucke
         this.indexArray = new TriangleIndexArray();
         this.segments = new SegmentVector();
         this.programConfigurations = new ProgramConfigurationSet(layoutAttributes, options.layers, options.zoom);
+        this.stateDependentLayerIds = this.layers.filter((l) => l.isStateDependent()).map((l) => l.id);
+
     }
 
     populate(features: Array<IndexedFeature>, options: PopulateParameters) {
@@ -121,7 +124,7 @@ class CircleBucket<Layer: CircleStyleLayer | HeatmapStyleLayer> implements Bucke
                 const y = point.y;
 
                 // Do not include points that are outside the tile boundaries.
-                if (x < 0 || x >= EXTENT || y < 0 || y >= EXTENT) continue;
+                if (x < 0 || x >= EXTENT || y < 0 || y > EXTENT) continue;
 
                 // this geometry will be of the Point type, and we'll derive
                 // two triangles from it.
